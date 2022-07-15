@@ -1,7 +1,9 @@
+import imp
 import os
 from collections.abc import Iterable
 import argparse
 from functools import partial
+from statistics import mode
 from PIL import Image
 from PIL import ImageDraw, ImageFont
 
@@ -10,7 +12,10 @@ import scipy.io as sio
 from scipy.optimize import linear_sum_assignment as assign
 import numpy as np
 
-from model.utils import mkdir, toYaml, dis2, colorRGB, getPointsFromHeatmap, get_config
+from model.utils.kit import mkdir,colorRGB,getPointsFromHeatmap
+from model.utils.yamlConfig import toYaml,get_config
+from model.utils.graphics import dis2
+
 
 PATH_DIC = {
     'cephalometric': '../data/ISBI2015_ceph/raw',
@@ -210,6 +215,9 @@ if __name__ == "__main__":
     pixel_dic = {}
     if not args.output:
         output = os.path.join('.eval', args.input.replace('/', '_'))
+    else:
+        output = args.output
+    
     for d in os.listdir(args.input):
         inp = os.path.join(args.input, d)
         if os.path.isdir(inp):
