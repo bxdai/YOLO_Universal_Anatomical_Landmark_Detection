@@ -6,7 +6,8 @@ import pandas as pd
 import torch
 import torch.utils.data as data
 
-from ..utils import gaussianHeatmap, transformer
+from model.utils.kit import gaussianHeatmap
+from model.utils.transform import transformer
 
 
 class Chest(data.Dataset):

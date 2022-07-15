@@ -11,9 +11,12 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from .utils import *
-from .datasets import get_dataset
-from .networks import get_loss, get_optim, get_net, get_scheduler
+from model.utils.yamlConfig import *
+from model.utils.kit import mkdir,norm
+from model.utils.plot import *
+from model.utils.mixIter import MixIter
+from model.datasets import get_dataset, hand
+from model.networks import get_loss, get_optim, get_net, get_scheduler
 
 
 class Runner(object):
@@ -134,7 +137,7 @@ class Runner(object):
         if torch.cuda.is_available() and self.phase == 'train':
             self.loss = self.loss.cuda()
             self.val_loss = self.val_loss.cuda()
-        self.device = next(self.model.parameters()).device
+        self.device = next(self.model.parameters()).device # 设置和参数一样的device
 
     def get_logger(self):
         pass
@@ -241,7 +244,6 @@ class Runner(object):
                     for k, v in name_loss_dic.items():
                         f.write('{:.6f} {}\n'.format(v, k))
         return val_loss
-
     def train(self):
         self.model.train()
         checkpoint_dir = os.path.join(self.run_dir, 'checkpoints')
@@ -297,7 +299,7 @@ class Runner(object):
                     data_dic = data_dic[0]
                 for k in {'input', 'gt'}:
                     data_dic[k] = torch.autograd.Variable(data_dic[k]).to(self.device)
-                data_dic.update(self.model(data_dic['input'], task_idx))
+                data_dic.update(self.model(data_dic['input'], task_idx)) #{'output':logits}
                 self.optim.zero_grad()
                 loss = self.loss(data_dic['output'], data_dic['gt'])  # TODO
                 if 'rec_image' in data_dic:
